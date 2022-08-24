@@ -70,7 +70,7 @@ def edited_lastnames (client)
   results.each do |row|
     next if row['lastname'].include? ' edited'
     modified_lastname = (row['lastname']).concat(' edited')
-    client.query("UPDATE people_davi_mattos SET lastname = '#{row['lastname']}' WHERE id = #{row['id']};")
+    client.query("UPDATE people_davi_mattos SET lastname = '#{row['lastname'].gsub("'", "''")}' WHERE id = #{row['id']};")
   end
 end
 
