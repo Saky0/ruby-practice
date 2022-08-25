@@ -126,3 +126,42 @@ def get_teachers_by_year(year, client)
     str
   end
 end
+
+def random_date(date_begin, date_end)
+  t1 = Time.parse(date_begin)
+  t2 = Time.parse(date_end)
+  puts rand(t1..t2).strftime('%Y-%m-%d')
+end
+
+def random_last_names(n, client)
+  f = "SELECT * FROM last_names ORDER BY rand() limit #{n}"
+  results = client.query(f).to_a
+  if results.count.zero?
+    puts "No values was found!"
+  else
+    results.map{|el| el['last_name']}.join(', ')
+  end
+end
+
+def random_last_names_local_variable(n, client)
+  f = "SELECT * FROM last_names ORDER BY rand() limit #{n}"
+  @results = @results ? @results : client.query(f).to_a
+  res = @results.sample(n).map{|r| "#{r['last_name']}"}.join(', ')
+  if @results.count == 0
+    puts "No values was found!"
+  else
+    "#{res}"
+  end
+end
+
+def random_first_names(n, client)
+  f = "SELECT m.FirstName as name, f.names as name FROM male_names m JOIN female_names f;"
+  @results = @results ? @results : client.query(f).to_a
+  res = @results.sample(n).map{|el| "#{el['name']}"}.join(', ')
+
+  if @results.count.zero?
+    puts "No values was found!"
+  else
+    "#{res}"
+  end
+end

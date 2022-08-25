@@ -2,6 +2,7 @@ require 'mysql2'
 require 'dotenv/load'
 require_relative './methods.rb'
 require 'digest'
+require 'time'
 $client = Mysql2::Client.new(host: "db09.blockshopper.com",
                              username: ENV['DB09_LGN'],
                              password: ENV['DB09_PWD'],
@@ -28,4 +29,26 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 
 # 6) Create method get_teachers_by_year which will get a year and return result in the next format:
 # "Teachers born in <YEAR>: <teacher name 1>, <teacher name 2> etc."
-puts get_teachers_by_year(1965, $client)
+# puts get_teachers_by_year(1965, $client)
+
+# === #
+# 1) Create method random_date which will get date_begin and date_end and return random date between them
+# random_date('2020-01-01', '2021-01-01')
+
+# 2) create method random_last_names which will get attribute n and return n random last names from the table last_names as array of strings
+# t = Time.now
+# array = []
+# 10.times do
+#   array.push(random_last_names(2, $client))
+# end
+# puts array
+# puts Time.now - t
+
+# 3) create method random_first_names which will get attribute n and return n random first names from the tables male_names and female_names as array of strings.
+t = Time.now
+array = []
+100.times do
+  array << random_first_names(1, $client)
+end
+puts array
+puts Time.now - t
