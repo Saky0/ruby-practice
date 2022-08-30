@@ -45,10 +45,21 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 # puts Time.now - t
 
 # 3) create method random_first_names which will get attribute n and return n random first names from the tables male_names and female_names as array of strings.
+# t = Time.now
+# array = []
+# 10.times do
+#   array << random_first_names(1, $client)
+# end
+# puts array
+# puts Time.now - t
+
+## Methods from 2022-08-29
+# 1) create new table random_people_<your name> to store first_name, last_name and birth_date there
+# create_table_random_people($client)
+
+# 2) create a method which will generate required (in argument) number of random combinations of first name, last name and birth date (between 1910 and 2022) and save them in your new table
 t = Time.now
-array = []
-100.times do
-  array << random_first_names(1, $client)
-end
-puts array
+generate_random_people(10000, $client)
 puts Time.now - t
+
+# 3) test the method and when it works fine generate 10k people and calculate processing time
