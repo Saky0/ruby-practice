@@ -1,6 +1,8 @@
+# frozen_string_literal: true
 require 'mysql2'
 require 'dotenv/load'
 require_relative './methods.rb'
+require_relative './methods_2022_08_30.rb'
 require 'digest'
 require 'time'
 $client = Mysql2::Client.new(host: "db09.blockshopper.com",
@@ -57,9 +59,30 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 # 1) create new table random_people_<your name> to store first_name, last_name and birth_date there
 # create_table_random_people($client)
 
-# 2) create a method which will generate required (in argument) number of random combinations of first name, last name and birth date (between 1910 and 2022) and save them in your new table
-t = Time.now
-generate_random_people(10000, $client)
-puts Time.now - t
-
+# 2) create a method which will generate required (in argument) number of random combinations of first name, 
+#   last name and birth date (between 1910 and 2022) and save them in your new table
 # 3) test the method and when it works fine generate 10k people and calculate processing time
+# t = Time.now
+# generate_random_people(10000, $client)
+# puts Time.now - t
+
+## Methods from 2022-08-30
+# 1) create new table - montana_public_district_report_card__uniq_dist_<your_name> with 
+#   columns id, name, clean_name, address, city, state, zip
+# create_table_uniq_districts($client)
+
+# 2) copy information about unique districts into this table (consider district as unique if it has unique combination of name, address, city, state and zip!)
+# select_uniq_district($client)
+insert_uniq_district($client)
+
+# 3.1) clean district names and save them in clean_name column
+# puts select_uniq_davi_m($client)
+clean_districts($client)
+# puts select_uniq_davi_m($client)
+
+# 3.2) Add 'district' at the end
+add_district_end($client)
+# puts select_uniq_davi_m($client)
+
+# 3.3) Delete all duplicated words
+del_dupplicated_words($client)
