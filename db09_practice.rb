@@ -3,6 +3,8 @@ require 'mysql2'
 require 'dotenv/load'
 require_relative './methods.rb'
 require_relative './methods_2022_08_30.rb'
+require_relative './davi_cleaning_script.rb'
+require_relative './davi_hle_test_02.rb'
 require 'digest'
 require 'time'
 $client = Mysql2::Client.new(host: "db09.blockshopper.com",
@@ -73,16 +75,20 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 
 # 2) copy information about unique districts into this table (consider district as unique if it has unique combination of name, address, city, state and zip!)
 # select_uniq_district($client)
-insert_uniq_district($client)
-
+# insert_uniq_district($client)
+#
 # 3.1) clean district names and save them in clean_name column
 # puts select_uniq_davi_m($client)
-clean_districts($client)
+# clean_districts($client)
 # puts select_uniq_davi_m($client)
 
 # 3.2) Add 'district' at the end
-add_district_end($client)
+# add_district_end($client)
 # puts select_uniq_davi_m($client)
 
 # 3.3) Delete all duplicated words
-del_dupplicated_words($client)
+# del_dupplicated_words($client)
+# davi_montana_uniq_district_cleaning($client)
+
+## Methods from the hle test 02
+davi_hle_dev_cleaning($client)
