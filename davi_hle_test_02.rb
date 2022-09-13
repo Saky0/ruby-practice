@@ -4,7 +4,7 @@ def escape(str)
   str = str.to_s
   return str if str == ''
   return if str == ''
-  str.gsub(/\\/, '\&\&').gsub(/'/, "'''")
+  str.gsub(/\\/, '\&\&').gsub(/'/, "'''").gsub(/  /, ' ')
 end
 
 def davi_hle_dev_cleaning(client)
@@ -45,7 +45,11 @@ def davi_hle_dev_cleaning(client)
       # The string was reversed to remove the latest repeated words and then reversed again to the original format
       res = res.gsub(/Twp/, 'Township').
           gsub(/Hwy|Highway highway|Hwy hwy/, 'Highway').
-          reverse.gsub(/\b(\w+)\b(?=.*?\b\1\b)/, '').reverse
+          gsub(/Elem|EL/, 'Elementary School ').
+          gsub(/H S|HS|Dist H S/, 'High School').
+          gsub(/Schls|Schools/, 'School').
+          gsub(/K-12|Public|School K-12/, 'Public School').
+          reverse.gsub(/\b(\w*)(\w+)(\w*)\b(?=.*?\b\2\b)/, '').reverse
       # Downcase everything unless the first word, so throughout the code capitalize only the specify words
       res = res.downcase.gsub(/^\b\w/, &:capitalize)
       # This Regex will do the sentece County Clerk/Recorder/DeKalb County becomes ‘DeKalb County clerk and recorder’
@@ -66,8 +70,9 @@ def davi_hle_dev_cleaning(client)
         capitalize_parentheses = $2.split(' ').map(&:capitalize).join(' ')
         "#{$1.strip.downcase} (#{capitalize_parentheses})"
       end
-      # Capitalize only the first letter of the first word
-      res = res.gsub(/^\b\w/, &:capitalize)
+      # Capitalize only the first letter of the first word and add ' District' at the end of the string
+      # If the sentence is already the "district" - downcased because the previous gsub - remove and put the " District"
+      res = res.gsub(/^\b\w/, &:capitalize).gsub(/district/, '').concat(' District')
 
       # UPDATE the register with the clean name in the field clean_name
       t = <<~SQL
