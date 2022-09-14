@@ -1,12 +1,3 @@
-# This method escapes any string when inserting or updating a MySQl table in Ruby using single quotes
-# You can use it everywhere when adding strings that could possibly have weird characters
-def escape(str)
-  str = str.to_s
-  return str if str == ''
-  return if str == ''
-  str.gsub(/\\/, '\&\&').gsub(/'/, "'''").gsub(/  /, ' ')
-end
-
 def html_data_scraping(client)
   c = <<~SQL
     CREATE TABLE IF NOT EXISTS covid_test_scraping_task_davi_mattos (
