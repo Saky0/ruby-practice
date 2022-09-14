@@ -5,8 +5,13 @@ require_relative './methods.rb'
 require_relative './methods_2022_08_30.rb'
 require_relative './davi_cleaning_script.rb'
 require_relative './davi_hle_test_02.rb'
+require_relative './davi_data_scraping_task_01.rb'
 require 'digest'
 require 'time'
+require 'rubygems'
+require 'nokogiri'
+require 'open-uri'
+require 'csv'
 $client = Mysql2::Client.new(host: "db09.blockshopper.com",
                              username: ENV['DB09_LGN'],
                              password: ENV['DB09_PWD'],
@@ -91,4 +96,9 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 # davi_montana_uniq_district_cleaning($client)
 
 ## Methods from the hle test 02
-davi_hle_dev_cleaning($client)
+# davi_hle_dev_cleaning($client)
+#
+
+## Methods from the Scrape task
+html_data_scraping($client)
+
