@@ -55,13 +55,7 @@ def html_data_scraping(client)
     page.search('table tbody tr').each do |row|
       # remove the comma from the integer values and parse to float only the values that has a dot
       cells = row.search('td').map { |e| e.text.gsub(/\,/, '').strip }
-      cells = cells.map do |e|
-        if e.include? '.'
-          e = e.to_f
-        else
-          e = e.to_i
-        end
-      end
+
       f = <<~SQL
         INSERT INTO covid_test_scraping_task_davi_mattos (
         week,

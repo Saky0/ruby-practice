@@ -4,7 +4,7 @@ def escape(str)
   str = str.to_s
   return str if str == ''
   return if str == ''
-  str.gsub(/\\/, '\&\&').gsub(/'/, "'''").gsub(/  /, ' ')
+  str.gsub(/\\/, '\&\&').gsub(/'/, "''").gsub(/  /, ' ')
 end
 
 def davi_hle_dev_cleaning(client)
@@ -19,6 +19,16 @@ def davi_hle_dev_cleaning(client)
     SQL
     client.query(c)
     puts 'Table was created successfully!'
+    # I use this snippet to clean te table and set the first id = 1 in every time that I had restarted the script
+    c = <<~SQL
+      DELETE FROM hle_dev_test_davi_mattos;
+    SQL
+    client.query(c)
+    c = <<~SQL
+      ALTER TABLE hle_dev_test_davi_mattos auto_increment = 1;
+    SQL
+    client.query(c)
+    #
   rescue Mysql2::Error
     puts 'This table has already been created!'
   end
@@ -41,6 +51,7 @@ def davi_hle_dev_cleaning(client)
     results.each do |r|
       id = r['id']
       res = r['candidate_office_name']
+      puts "= #{id} - #{res}"
       # the gsubs are using regex as asked to reformat the names
       # The string was reversed to remove the latest repeated words and then reversed again to the original format
       res = res.gsub(/Twp/, 'Township').
@@ -49,30 +60,36 @@ def davi_hle_dev_cleaning(client)
           gsub(/H S|HS|Dist H S/, 'High School').
           gsub(/Schls|Schools/, 'School').
           gsub(/K-12|Public|School K-12/, 'Public School').
-          reverse.gsub(/\b(\w*)(\w+)(\w*)\b(?=.*?\b\2\b)/, '').reverse
-      # Downcase everything unless the first word, so throughout the code capitalize only the specify words
-      res = res.downcase.gsub(/^\b\w/, &:capitalize)
+          gsub(/\b(\w*)(\w+)(\w*)\b(?=.*?\b\2\b)/, '')
+      # Downcase everything that is not able to any pattern, thereafter the other cases will do downcase too
+      res = res.match(/[\/\,]/) ? res : res.downcase
       # This Regex will do the sentece County Clerk/Recorder/DeKalb County becomes ‘DeKalb County clerk and recorder’
-      res = res.gsub(/^(?<s1>\w+(?!\/)) (?<s2>.+(?=\/)).+(?<s3>(?<=\/).+.*)/) do |match|
+      res = res.gsub(/^(?<s1>[\w\']+(?!\/))? (?<s2>.+(?=\/)).+(?<s3>(?<=\/).+.*)/) do |match|
         # Deal with the cases that the string has doble '//'
         init = Regexp.last_match(:s3).strip
-        second = Regexp.last_match(:s1).strip
+        second = Regexp.last_match(:s1).nil? ? '' : Regexp.last_match(:s1).strip
         optional_end = Regexp.last_match(:s2).gsub(/\/\//, '/').split('/')
         # Add the " and " if there's more than one value
         optional_end = optional_end.map(&:itself).join(' and ').downcase
-        "#{init.split(' ').map(&:capitalize).join(' ')} #{second.split(' ').map(&:capitalize).join(' ')} #{optional_end}"
+
+        # If the name is all capitalized, keep and make no changes
+        init = init.match(/^[A-Z ]+$/) ? init : init.split(' ').map(&:capitalize).join(' ')
+        "#{init} #{second.downcase} #{optional_end}"
       end
-      # Anything after a slash gets moved to the front of the name and remains capitalized
-      res = res.gsub(/(.+(?=\/)).*((?<=\/)[\w ]+)/) { |match| "#{$2.strip} #{$1.strip.downcase}" }
       # Anything after a comma gets put in parentheses
-      # res = res.gsub(/^(.+(?=\,)).*((?<=\,).+)/) { |match| "#{$1.strip.downcase} (#{$2.strip})"}
       res = res.gsub(/^(.+(?=\,)).*((?<=\,).+)/) do |match|
         capitalize_parentheses = $2.split(' ').map(&:capitalize).join(' ')
         "#{$1.strip.downcase} (#{capitalize_parentheses})"
       end
-      # Capitalize only the first letter of the first word and add ' District' at the end of the string
-      # If the sentence is already the "district" - downcased because the previous gsub - remove and put the " District"
-      res = res.gsub(/^\b\w/, &:capitalize).gsub(/district/, '').concat(' District')
+      # Anything after a slash gets moved to the front of the name and remains capitalized
+      res = res.gsub(/(.+(?=\/)).*((?<=\/)[\w ]+)/) { |match| "#{$2.split(' ').map(&:capitalize).join(' ')} #{$1.strip.downcase}" }
+      # Due the last gsub, put everything inside the parentheses capitalized
+      res = res.gsub(/\((.*)\)/) do |match|
+        "(#{$1.split(' ').map(&:capitalize).join(' ')})"
+      end
+      # Fix the consecutive blanks
+      res = res.gsub(/\s{2,}/, ' ')
+      puts "#{res}"
 
       # UPDATE the register with the clean name in the field clean_name
       t = <<~SQL

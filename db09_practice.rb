@@ -96,9 +96,10 @@ $client = Mysql2::Client.new(host: "db09.blockshopper.com",
 # davi_montana_uniq_district_cleaning($client)
 
 ## Methods from the hle test 02
-# davi_hle_dev_cleaning($client)
+davi_hle_dev_cleaning($client)
 #
 
 ## Methods from the Scrape task
-html_data_scraping($client)
+# html_data_scraping($client)
+
 
